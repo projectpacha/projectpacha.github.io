@@ -1,1 +1,89 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Pacha Malayalam Dictionary</title><link rel="stylesheet" href="styles.css"><link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;700&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></head> <body><nav class="navbar"> <div class="logo">പച്ചമലയാളം</div> <div class="icons"> <span class="material-icons theme-toggle">light_mode</span> <span class="material-icons menu-icon">menu</span> </div> </nav> <div class="mobile-menu hidden"> <ul> <li><a href="index.html">പൂമുറ്റം</a></li> <li><a href="wordlist.html">വാക്കുവരി</a></li> <li><a href="about.html">കുറിച്ച്</a></li> <li><a href="addword.html">വാക്കുചേര്‍ക്കൂ</a></li> <li><a href="participate.html">പങ്കുചേരൂ</a></li> </ul> </div> <main> <div class="alphabet-filter"> <span class="alphabet" data-letter="അ">അ</span> <span class="alphabet" data-letter="ആ">ആ</span> <span class="alphabet" data-letter="ഇ">ഇ</span> <span class="alphabet" data-letter="ഈ">ഈ</span> <span class="alphabet" data-letter="ഉ">ഉ</span> <span class="alphabet" data-letter="ഊ">ഊ</span> <span class="alphabet" data-letter="എ">എ</span> <span class="alphabet" data-letter="ഏ">ഏ</span> <span class="alphabet" data-letter="ഐ">ഐ</span> <span class="alphabet" data-letter="ഒ">ഒ</span> <span class="alphabet" data-letter="ഓ">ഓ</span> <span class="alphabet" data-letter="ഔ">ഔ</span> <span class="alphabet" data-letter="ക">ക</span> <span class="alphabet" data-letter="ച">ച</span> <span class="alphabet" data-letter="ഞ">ഞ</span> <span class="alphabet" data-letter="ട">ട</span> <span class="alphabet" data-letter="ത">ത</span> <span class="alphabet" data-letter="ന">ന</span> <span class="alphabet" data-letter="പ">പ</span> <span class="alphabet" data-letter="മ">മ</span> <span class="alphabet" data-letter="യ">യ</span> <span class="alphabet" data-letter="ര">ര</span> <span class="alphabet" data-letter="ല">ല</span> <span class="alphabet" data-letter="വ">വ</span> <span class="alphabet" data-letter="റ">റ</span> <span class="alphabet" data-letter="ശ">ശ</span> <span class="alphabet" data-letter="സ">സ</span> </div> <main> <div id="word-list"></div> <div class="pagination"> <button id="prev-page" disabled>←</button> <span id="page-info">Page 1</span> <button id="next-page">→</button> </div> </main> <footer class="footer"> <nav> <a href="index.html">പൂമുറ്റം</a> <a href="wordlist.html">വാക്കുവരി</a> <a href="about.html">കുറിച്ച്</a> <a href="addword.html">വാക്കുചേര്‍ക്കൂ</a> <a href="participate.html">പങ്കുചേരൂ</a> </nav> <p>copyright @ 2024</p> </footer> <script src="wordlist.js" defer></script> <script src="scripts.js" defer></script> </body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacha Malayalam Dictionary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="logo">പച്ചമലയാളം</div>
+        <div class="icons">
+            <span class="material-icons theme-toggle">light_mode</span>
+            <span class="material-icons menu-icon">menu</span>
+        </div>
+    </nav>
+
+    
+    <div class="mobile-menu hidden">
+        <ul>
+            <li><a href="index.html">പൂമുറ്റം</a></li>
+            <li><a href="wordlist.html">വാക്കുവരി</a></li>
+            <li><a href="about.html">കുറിച്ച്</a></li>
+            <li><a href="addword.html">വാക്കുചേര്‍ക്കൂ</a></li>
+            <li><a href="participate.html">പങ്കുചേരൂ</a></li>
+        </ul>
+    </div>
+
+    <main>
+ 
+<div class="alphabet-filter">
+    <span class="alphabet" data-letter="അ">അ</span>
+    <span class="alphabet" data-letter="ആ">ആ</span>
+    <span class="alphabet" data-letter="ഇ">ഇ</span>
+    <span class="alphabet" data-letter="ഈ">ഈ</span>
+    <span class="alphabet" data-letter="ഉ">ഉ</span>
+    <span class="alphabet" data-letter="ഊ">ഊ</span>
+        <span class="alphabet" data-letter="എ">എ</span>
+    <span class="alphabet" data-letter="ഏ">ഏ</span>
+    <span class="alphabet" data-letter="ഐ">ഐ</span>
+    <span class="alphabet" data-letter="ഒ">ഒ</span>
+    <span class="alphabet" data-letter="ഓ">ഓ</span>
+    <span class="alphabet" data-letter="ഔ">ഔ</span>
+    <span class="alphabet" data-letter="ക">ക</span>
+    <span class="alphabet" data-letter="ച">ച</span>
+    <span class="alphabet" data-letter="ഞ">ഞ</span>
+    <span class="alphabet" data-letter="ട">ട</span>
+    <span class="alphabet" data-letter="ത">ത</span>
+    <span class="alphabet" data-letter="ന">ന</span>
+    <span class="alphabet" data-letter="പ">പ</span>
+    <span class="alphabet" data-letter="മ">മ</span>
+    <span class="alphabet" data-letter="യ">യ</span>
+    <span class="alphabet" data-letter="ര">ര</span>
+    <span class="alphabet" data-letter="ല">ല</span>
+    <span class="alphabet" data-letter="വ">വ</span>
+    <span class="alphabet" data-letter="റ">റ</span>
+    <span class="alphabet" data-letter="ശ">ശ</span>
+    <span class="alphabet" data-letter="സ">സ</span>
+</div>
+
+<main>
+    <div id="word-list"></div>
+    <div class="pagination">
+        <button id="prev-page" disabled>←</button>
+        <span id="page-info">Page 1</span>
+        <button id="next-page">→</button>
+    </div>
+</main>
+
+    
+    <footer class="footer">
+        <nav>
+            <a href="index.html">പൂമുറ്റം</a>
+              <a href="wordlist.html">വാക്കുവരി</a>
+            <a href="about.html">കുറിച്ച്</a>
+            <a href="addword.html">വാക്കുചേര്‍ക്കൂ</a>
+            <a href="participate.html">പങ്കുചേരൂ</a>
+        </nav>
+        <p>copyright @ 2024</p>
+    </footer>
+
+    
+    <script src="wordlist.js" defer></script>
+    <script src="scripts.js" defer></script>
+</body>
+</html>
