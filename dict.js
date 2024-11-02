@@ -16,11 +16,17 @@ function transliterate() {
     searchInput.value = output;
 }
 
+function normalizeMalayalam(text) {
+    return text.replace(/\u200D/g, ''); 
+}
+
 document.getElementById('searchIcon').addEventListener('click', searchDictionary);
 
 async function searchDictionary() {
-    const query = document.getElementById('searchInput').value.trim();
+    let query = document.getElementById('searchInput').value.trim();
     if (!query) return;
+
+   query = normalizeMalayalam(query);
 
     const searchType = determineSearchType(query);  
 
@@ -45,18 +51,24 @@ async function searchHeadword(query) {
         let otherMatches = [];
         let relatedWords = new Set();
 
+        const normalizedQuery = normalizeMalayalam(query);
+
         Array.from(entries).forEach(entry => {
-            const headword = entry.getElementsByTagName('headword')[0].textContent;
-            const variation = entry.getElementsByTagName('variation')[0]?.textContent || '';
+
+            const originalHeadword = entry.getElementsByTagName('headword')[0].textContent;
+            const originalVariation = entry.getElementsByTagName('variation')[0]?.textContent || '';
             const pos = entry.getElementsByTagName('pos')[0].textContent;
             const senses = Array.from(entry.getElementsByTagName('sense')).map(sense => sense.textContent);
 
-            if (headword === query || variation === query) {
+            const normalizedHeadword = normalizeMalayalam(originalHeadword);
+            const normalizedVariation = normalizeMalayalam(originalVariation);
+
+            if (normalizedHeadword === normalizedQuery || normalizedVariation === normalizedQuery) {
                 foundExact = true;
-                displayEntry(headword, variation, pos, senses, resultsContainer);
-                findRelatedWords(entries, headword, senses, relatedWords);
-            } else if (headword.includes(query) || variation.includes(query)) {
-                otherMatches.push(headword);
+                displayEntry(originalHeadword, originalVariation, pos, senses, resultsContainer); 
+                findRelatedWords(entries, originalHeadword, senses, relatedWords);
+            } else if (normalizedHeadword.includes(normalizedQuery) || normalizedVariation.includes(normalizedQuery)) {
+                otherMatches.push(originalHeadword); 
             }
         });
 
@@ -122,7 +134,7 @@ function displayEntry(headword, variation, pos, senses, container) {
 
     entryDiv.innerHTML = `
        <h3>${headword}${variation ? ` (${variation})` : ''}</h3>
-       <p class="iso-transliteration">${isoTransliteration}${variation ? ` | Variation: ${isoTransliterationVariation}` : ''}</p>
+       <p class="iso-transliteration">${isoTransliteration}${variation ? ` | ${isoTransliterationVariation}` : ''}</p>
        <h4><strong></strong> ${pos}</h4>
        <p><strong></strong> ${senses.join(', ')}</p>
     `;
