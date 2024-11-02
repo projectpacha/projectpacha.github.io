@@ -1,1 +1,100 @@
-document.addEventListener("DOMContentLoaded",(function(){const e=document.querySelectorAll(".alphabet"),t=document.getElementById("word-list"),n=document.getElementById("prev-page"),a=document.getElementById("next-page"),i=document.getElementById("page-info");let d=1,o="അ",s=null;let r=null;function l(e,d=1){const o=s.getElementsByTagName("entry"),l=50*(d-1),c=50*d;t.innerHTML="";let m=Array.from(o).filter((t=>{const n=t.getElementsByTagName("headword")[0]?.textContent.trim();return n&&n.startsWith(e)}));m.slice(l,c).forEach((e=>{0;const n=e.getElementsByTagName("headword")[0]?.textContent.trim(),a=e.getElementsByTagName("variation")[0]?.textContent.trim()||"",i=e.getElementsByTagName("pos")[0]?.textContent.trim()||"",d=Array.from(e.getElementsByTagName("sense")).map((e=>e?.textContent.trim())),o=document.createElement("div");o.className="word-item",o.innerHTML=`\n    <h3 class="word-header">${n}${a?" ("+a+")":""}</h3>\n    <div class="word-details hidden">\n        <h4> ${i}</h4>\n        <p> ${d.join(", ")}</p>\n    </div>\n`,o.querySelector(".word-header").addEventListener("click",(function(){r&&r!==o&&r.querySelector(".word-details").classList.add("hidden");const e=o.querySelector(".word-details");e.classList.toggle("hidden"),r=e.classList.contains("hidden")?null:o})),t.appendChild(o)})),function(e,t){const d=Math.ceil(e/50);i.textContent=`Page ${t} of ${d}`,n.disabled=1===t,a.disabled=t===d}(m.length,d)}e.forEach((t=>{t.addEventListener("click",(function(){o=this.getAttribute("data-letter"),d=1,e.forEach((e=>e.classList.remove("active"))),this.classList.add("active"),l(o,d)}))})),n.addEventListener("click",(function(){d>1&&(d--,l(o,d))})),a.addEventListener("click",(function(){d++,l(o,d)})),async function(){const e=await fetch("data.xml"),t=await e.text(),n=new DOMParser;s=n.parseFromString(t,"application/xml"),l(o,d)}()}));
+document.addEventListener("DOMContentLoaded", function() {
+    const alphabetElements = document.querySelectorAll(".alphabet");
+    const wordListContainer = document.getElementById("word-list");
+    const prevPageButton = document.getElementById("prev-page");
+    const nextPageButton = document.getElementById("next-page");
+    const pageInfo = document.getElementById("page-info");
+    const WORDS_PER_PAGE = 50;
+    let currentPage = 1;
+    let currentLetter = "അ";
+    let xmlDoc = null;
+
+    async function loadXML() {
+        const response = await fetch("data.xml");
+        const xml = await response.text();
+        const parser = new DOMParser();
+        xmlDoc = parser.parseFromString(xml, "application/xml");
+        filterWords(currentLetter, currentPage);
+    }
+
+let openDetails = null; 
+
+function filterWords(letter, page = 1) {
+    const entries = xmlDoc.getElementsByTagName("entry");
+    const startIndex = (page - 1) * WORDS_PER_PAGE;
+    const endIndex = page * WORDS_PER_PAGE;
+    let wordCount = 0;
+
+    wordListContainer.innerHTML = ""; 
+    let filteredEntries = Array.from(entries).filter((entry) => {
+        const headword = entry.getElementsByTagName("headword")[0]?.textContent.trim();
+        return headword && headword.startsWith(letter);
+    });
+
+    filteredEntries.slice(startIndex, endIndex).forEach(entry => {
+        wordCount++;
+        const headword = entry.getElementsByTagName("headword")[0]?.textContent.trim();
+        const variation = entry.getElementsByTagName("variation")[0]?.textContent.trim() || "";
+        const pos = entry.getElementsByTagName("pos")[0]?.textContent.trim() || "";
+        const senses = Array.from(entry.getElementsByTagName("sense")).map(sense => sense?.textContent.trim());
+
+        const listItem = document.createElement("div");
+        listItem.className = "word-item";
+        listItem.innerHTML = `
+    <h3 class="word-header">${headword}${variation ? ' (' + variation + ')' : ''}</h3>
+    <div class="word-details hidden">
+        <h4> ${pos}</h4>
+        <p> ${senses.join(", ")}</p>
+    </div>
+`;
+
+        listItem.querySelector(".word-header").addEventListener("click", function() {
+
+            if (openDetails && openDetails !== listItem) {
+                openDetails.querySelector(".word-details").classList.add("hidden");
+            }
+
+            const details = listItem.querySelector(".word-details");
+            details.classList.toggle("hidden");
+
+            openDetails = details.classList.contains("hidden") ? null : listItem;
+        });
+
+        wordListContainer.appendChild(listItem);
+    });
+
+    updatePaginationControls(filteredEntries.length, page);
+}
+
+    function updatePaginationControls(totalEntries, page) {
+        const totalPages = Math.ceil(totalEntries / WORDS_PER_PAGE);
+
+        pageInfo.textContent = `Page ${page} of ${totalPages}`;
+        prevPageButton.disabled = page === 1;
+        nextPageButton.disabled = page === totalPages;
+    }
+
+    alphabetElements.forEach(element => {
+        element.addEventListener("click", function() {
+            currentLetter = this.getAttribute("data-letter");
+            currentPage = 1;  
+            alphabetElements.forEach(el => el.classList.remove("active"));
+            this.classList.add("active");
+            filterWords(currentLetter, currentPage);
+        });
+    });
+
+    prevPageButton.addEventListener("click", function() {
+        if (currentPage > 1) {
+            currentPage--;
+            filterWords(currentLetter, currentPage);
+        }
+    });
+
+    nextPageButton.addEventListener("click", function() {
+        currentPage++;
+        filterWords(currentLetter, currentPage);
+    });
+
+    loadXML();
+});
