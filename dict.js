@@ -20,15 +20,30 @@ function normalizeMalayalam(text) {
     return text.replace(/\u200D/g, ''); 
 }
 
+function normalizeMalayalamChillu(text) {
+    return text
+        .replace(/\u0D7A/g, '\u0D23')  
+        .replace(/\u0D7B/g, '\u0D28')  
+        .replace(/\u0D7C/g, '\u0D31')  
+        .replace(/\u0D7D/g, '\u0D32')  
+        .replace(/\u0D7E/g, '\u0D33')  
+        .replace(/\u0D7F/g, '\u0D2F'); 
+}
+function normalizeHeadword(text) {
+
+    text = normalizeMalayalam(text);
+
+    return normalizeMalayalamChillu(text);
+}
+
 document.getElementById('searchIcon').addEventListener('click', searchDictionary);
 
 async function searchDictionary() {
     let query = document.getElementById('searchInput').value.trim();
     if (!query) return;
 
-   query = normalizeMalayalam(query);
-
-    const searchType = determineSearchType(query);  
+    query = normalizeHeadword(query);
+    const searchType = determineSearchType(query);
 
     if (searchType === 'headword') {
         await searchHeadword(query);
@@ -51,24 +66,23 @@ async function searchHeadword(query) {
         let otherMatches = [];
         let relatedWords = new Set();
 
-        const normalizedQuery = normalizeMalayalam(query);
+        const normalizedQuery = normalizeHeadword(query);
 
         Array.from(entries).forEach(entry => {
-
             const originalHeadword = entry.getElementsByTagName('headword')[0].textContent;
             const originalVariation = entry.getElementsByTagName('variation')[0]?.textContent || '';
             const pos = entry.getElementsByTagName('pos')[0].textContent;
             const senses = Array.from(entry.getElementsByTagName('sense')).map(sense => sense.textContent);
 
-            const normalizedHeadword = normalizeMalayalam(originalHeadword);
-            const normalizedVariation = normalizeMalayalam(originalVariation);
+            const normalizedHeadword = normalizeHeadword(originalHeadword);
+            const normalizedVariation = normalizeHeadword(originalVariation);
 
             if (normalizedHeadword === normalizedQuery || normalizedVariation === normalizedQuery) {
                 foundExact = true;
-                displayEntry(originalHeadword, originalVariation, pos, senses, resultsContainer); 
+                displayEntry(originalHeadword, originalVariation, pos, senses, resultsContainer);
                 findRelatedWords(entries, originalHeadword, senses, relatedWords);
             } else if (normalizedHeadword.includes(normalizedQuery) || normalizedVariation.includes(normalizedQuery)) {
-                otherMatches.push(originalHeadword); 
+                otherMatches.push(originalHeadword);
             }
         });
 
@@ -263,4 +277,3 @@ document.addEventListener('click', (event) => {
         historyContainer.classList.add('hidden');
     }
 });
-
