@@ -1,6 +1,254 @@
-let typingTimer;const debounceDelay=300;function debouncedTransliterate(){clearTimeout(typingTimer),typingTimer=setTimeout(()=>{manglishToggle.checked&&transliterate()},debounceDelay)}function transliterate(){var e=searchInput.value,e=manglishToMalayalam(e);searchInput.value=e}async function searchDictionary(){var e,t=document.getElementById("searchInput").value.trim();t&&("headword"===(e=determineSearchType(t))?await searchHeadword(t):"sense"===e&&await searchSense(t))}async function searchHeadword(c){try{var e=await(await fetch("data.xml")).text();const i=(new DOMParser).parseFromString(e,"application/xml").getElementsByTagName("entry"),d=document.getElementById("results-container");d.innerHTML="";let r=!1,s=[],o=new Set;Array.from(i).forEach(e=>{var t=e.getElementsByTagName("headword")[0].textContent,n=e.getElementsByTagName("variation")[0]?.textContent||"",a=e.getElementsByTagName("pos")[0].textContent,e=Array.from(e.getElementsByTagName("sense")).map(e=>e.textContent);t===c||n===c?(r=!0,displayEntry(t,n,a,e,d),findRelatedWords(i,t,e,o)):(t.includes(c)||n.includes(c))&&s.push(t)}),r||(d.innerHTML="<p>No exact match found.</p>"),displayOtherMatches(s,d),displayRelatedWords(o,d)}catch(e){console.error("Error fetching or parsing XML:",e),document.getElementById("results-container").innerHTML="<p>Could not load data.</p>"}}async function searchSense(r){try{var e=await(await fetch("data.xml")).text(),t=(new DOMParser).parseFromString(e,"application/xml").getElementsByTagName("entry");const n=document.getElementById("results-container");n.innerHTML="";let a=[];Array.from(t).forEach(e=>{var t=e.getElementsByTagName("headword")[0].textContent,n=e.getElementsByTagName("pos")[0].textContent,e=Array.from(e.getElementsByTagName("sense")).map(e=>e.textContent);0<e.filter(e=>e.includes(r)).length&&a.push({headword:t,pos:n,senses:e})}),0===a.length?n.innerHTML="<p>No matches found.</p>":a.forEach(e=>displayEntry(e.headword,e.pos,e.senses,n))}catch(e){console.error("Error fetching or parsing XML:",e),document.getElementById("results-container").innerHTML="<p>Could not load data.</p>"}}function determineSearchType(e){return e.match(/^[a-zA-Z]+$/)?"sense":"headword"}function displayEntry(e,t,n,a,r){var s=document.createElement("div"),o=(s.classList.add("result"),transliterateToISO(e)),c=transliterateToISO(t);s.innerHTML=`
-       <h3>${e}${t?` (${t})`:""}</h3>
-         <p class="iso-transliteration">${o}${t?" | Variation: "+c:""}</p>
-        <h4><strong></strong> ${n}</h4>
-        <p><strong></strong> ${a.join(", ")}</p>
-    `,r.appendChild(s)}function displayOtherMatches(e,t){if(0<e.length){const n=document.createElement("div");n.classList.add("other-matches"),n.innerHTML="<h4>other matches</h4>",e.forEach(t=>{var e=document.createElement("a");e.href="#",e.textContent=t,e.classList.add("match-link"),e.addEventListener("click",e=>{e.preventDefault(),document.getElementById("searchInput").value=t,searchDictionary()}),n.appendChild(e),n.appendChild(document.createElement("br"))}),t.appendChild(n)}}function displayRelatedWords(e,t){if(0<e.size){const n=document.createElement("div");n.classList.add("related-words"),n.innerHTML="<h4>Related Words:</h4>",e.forEach(t=>{var e=document.createElement("a");e.href="#",e.textContent=t,e.classList.add("related-link"),e.addEventListener("click",e=>{e.preventDefault(),document.getElementById("searchInput").value=t,searchDictionary()}),n.appendChild(e),n.appendChild(document.createElement("br"))}),t.appendChild(n)}}function findRelatedWords(e,n,a,r){Array.from(e).forEach(e=>{const t=e.getElementsByTagName("headword")[0].textContent;t!==n&&Array.from(e.getElementsByTagName("sense")).forEach(e=>{a.includes(e.textContent)&&!r.has(t)&&r.add(t)})})}function toggleHistory(){var e=document.getElementById("search-history");e.classList.contains("hidden")?showSearchHistory():e.classList.add("hidden")}function addSearchHistory(e){var t=JSON.parse(localStorage.getItem("searchHistory"))||[];t.includes(e)||(t.unshift(e),10<t.length&&t.pop(),localStorage.setItem("searchHistory",JSON.stringify(t)))}function showSearchHistory(){const n=document.getElementById("search-history");n.innerHTML="";var e=JSON.parse(localStorage.getItem("searchHistory"))||[];0===e.length?n.innerHTML='<p class="search-history-item">No search history</p>':e.forEach(e=>{var t=document.createElement("div");t.classList.add("search-history-item"),t.textContent=e,t.addEventListener("click",()=>{document.getElementById("searchInput").value=e,n.classList.add("hidden"),searchDictionary()}),n.appendChild(t)}),n.classList.remove("hidden")}document.getElementById("searchIcon").addEventListener("click",searchDictionary),document.getElementById("searchIcon").addEventListener("click",()=>{var e=document.getElementById("searchInput").value.trim();e&&(addSearchHistory(e),searchDictionary())}),document.getElementById("history-icon").addEventListener("click",toggleHistory),document.addEventListener("click",e=>{var t=document.getElementById("search-history");t.contains(e.target)||document.getElementById("history-icon").contains(e.target)||t.classList.add("hidden")});
+let typingTimer;
+const debounceDelay = 300;
+
+function debouncedTransliterate() {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+        if (manglishToggle.checked) { 
+            transliterate();
+        }
+    }, debounceDelay);
+}
+
+function transliterate() {
+    const input = searchInput.value;
+    const output = manglishToMalayalam(input);
+    searchInput.value = output;
+}
+
+document.getElementById('searchIcon').addEventListener('click', searchDictionary);
+
+async function searchDictionary() {
+    const query = document.getElementById('searchInput').value.trim();
+    if (!query) return;
+
+    const searchType = determineSearchType(query);  
+
+    if (searchType === 'headword') {
+        await searchHeadword(query);
+    } else if (searchType === 'sense') {
+        await searchSense(query);
+    }
+}
+
+async function searchHeadword(query) {
+    try {
+        const response = await fetch('data.xml');
+        const xmlText = await response.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+        const entries = xmlDoc.getElementsByTagName('entry');
+
+        const resultsContainer = document.getElementById('results-container');
+        resultsContainer.innerHTML = '';
+        let foundExact = false;
+        let otherMatches = [];
+        let relatedWords = new Set();
+
+        Array.from(entries).forEach(entry => {
+            const headword = entry.getElementsByTagName('headword')[0].textContent;
+            const variation = entry.getElementsByTagName('variation')[0]?.textContent || '';
+            const pos = entry.getElementsByTagName('pos')[0].textContent;
+            const senses = Array.from(entry.getElementsByTagName('sense')).map(sense => sense.textContent);
+
+            if (headword === query || variation === query) {
+                foundExact = true;
+                displayEntry(headword, variation, pos, senses, resultsContainer);
+                findRelatedWords(entries, headword, senses, relatedWords);
+            } else if (headword.includes(query) || variation.includes(query)) {
+                otherMatches.push(headword);
+            }
+        });
+
+        if (!foundExact) {
+            resultsContainer.innerHTML = '<p>No exact match found.</p>';
+        }
+
+        displayOtherMatches(otherMatches, resultsContainer);
+        displayRelatedWords(relatedWords, resultsContainer);
+
+    } catch (error) {
+        console.error('Error fetching or parsing XML:', error);
+        document.getElementById('results-container').innerHTML = '<p>Could not load data.</p>';
+    }
+}
+
+async function searchSense(query) {
+    try {
+        const response = await fetch('data.xml');
+        const xmlText = await response.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+        const entries = xmlDoc.getElementsByTagName('entry');
+
+        const resultsContainer = document.getElementById('results-container');
+        resultsContainer.innerHTML = '';
+        let matches = [];
+
+        Array.from(entries).forEach(entry => {
+            const headword = entry.getElementsByTagName('headword')[0].textContent;
+            const pos = entry.getElementsByTagName('pos')[0].textContent;
+            const senses = Array.from(entry.getElementsByTagName('sense')).map(sense => sense.textContent);
+
+            const matchingSenses = senses.filter(sense => sense.includes(query));
+            if (matchingSenses.length > 0) {
+                matches.push({ headword, pos, senses });
+            }
+        });
+
+        if (matches.length === 0) {
+            resultsContainer.innerHTML = '<p>No matches found.</p>';
+        } else {
+             matches.forEach(match => displayEntry(match.headword, '', match.pos, match.senses, resultsContainer));
+        }
+
+    } catch (error) {
+        console.error('Error fetching or parsing XML:', error);
+        document.getElementById('results-container').innerHTML = '<p>Could not load data.</p>';
+    }
+}
+
+function determineSearchType(query) {
+
+    return query.match(/^[a-zA-Z]+$/) ? 'sense' : 'headword';
+}
+
+function displayEntry(headword, variation, pos, senses, container) {
+    const entryDiv = document.createElement('div');
+    entryDiv.classList.add('result');
+
+    const isoTransliteration = transliterateToISO(headword);
+    const isoTransliterationVariation = transliterateToISO(variation);
+
+    entryDiv.innerHTML = `
+       <h3>${headword}${variation ? ` (${variation})` : ''}</h3>
+       <p class="iso-transliteration">${isoTransliteration}${variation ? ` | Variation: ${isoTransliterationVariation}` : ''}</p>
+       <h4><strong></strong> ${pos}</h4>
+       <p><strong></strong> ${senses.join(', ')}</p>
+    `;
+    container.appendChild(entryDiv);
+}
+
+function displayOtherMatches(matches, container) {
+    if (matches.length > 0) {
+        const otherMatchesDiv = document.createElement('div');
+        otherMatchesDiv.classList.add('other-matches');
+        otherMatchesDiv.innerHTML = `<h4>other matches</h4>`;
+        matches.forEach(match => {
+            const matchLink = document.createElement('a');
+            matchLink.href = '#';
+            matchLink.textContent = match;
+            matchLink.classList.add('match-link');
+            matchLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('searchInput').value = match;
+                searchDictionary();
+            });
+            otherMatchesDiv.appendChild(matchLink);
+            otherMatchesDiv.appendChild(document.createElement('br'));
+        });
+        container.appendChild(otherMatchesDiv);
+    }
+}
+
+function displayRelatedWords(relatedWords, container) {
+    if (relatedWords.size > 0) {
+        const relatedWordsDiv = document.createElement('div');
+        relatedWordsDiv.classList.add('related-words');
+        relatedWordsDiv.innerHTML = `<h4>Related Words:</h4>`;
+        relatedWords.forEach(word => {
+            const wordLink = document.createElement('a');
+            wordLink.href = '#';
+            wordLink.textContent = word;
+            wordLink.classList.add('related-link');
+            wordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('searchInput').value = word;
+                searchDictionary();
+            });
+            relatedWordsDiv.appendChild(wordLink);
+            relatedWordsDiv.appendChild(document.createElement('br'));
+        });
+        container.appendChild(relatedWordsDiv);
+    }
+}
+
+function findRelatedWords(entries, headword, senses, relatedWords) {
+    Array.from(entries).forEach(otherEntry => {
+        const otherHeadword = otherEntry.getElementsByTagName('headword')[0].textContent;
+        if (otherHeadword !== headword) {
+            Array.from(otherEntry.getElementsByTagName('sense')).forEach(otherSense => {
+                if (senses.includes(otherSense.textContent) && !relatedWords.has(otherHeadword)) {
+                    relatedWords.add(otherHeadword);
+                }
+            });
+        }
+    });
+}
+
+document.getElementById('searchIcon').addEventListener('click', () => {
+    const query = document.getElementById('searchInput').value.trim();
+    if (query) {
+        addSearchHistory(query);
+        searchDictionary();
+    }
+});
+
+document.getElementById('history-icon').addEventListener('click', toggleHistory);
+
+function toggleHistory() {
+    const historyContainer = document.getElementById('search-history');
+    if (historyContainer.classList.contains('hidden')) {
+        showSearchHistory();
+    } else {
+        historyContainer.classList.add('hidden');
+    }
+}
+
+function addSearchHistory(query) {
+    let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    if (!history.includes(query)) {
+        history.unshift(query);
+        if (history.length > 10) history.pop(); 
+        localStorage.setItem('searchHistory', JSON.stringify(history));
+    }
+}
+
+function showSearchHistory() {
+    const historyContainer = document.getElementById('search-history');
+    historyContainer.innerHTML = '';
+    const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+    if (history.length === 0) {
+        historyContainer.innerHTML = '<p class="search-history-item">No search history</p>';
+    } else {
+        history.forEach(item => {
+            const historyItem = document.createElement('div');
+            historyItem.classList.add('search-history-item');
+            historyItem.textContent = item;
+            historyItem.addEventListener('click', () => {
+                document.getElementById('searchInput').value = item;
+                historyContainer.classList.add('hidden');
+                searchDictionary();
+            });
+            historyContainer.appendChild(historyItem);
+        });
+    }
+    historyContainer.classList.remove('hidden');
+}
+
+document.getElementById('searchInput').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); 
+        addSearchHistory(document.getElementById('searchInput').value.trim());
+        searchDictionary();
+    }
+});
+
+document.addEventListener('click', (event) => {
+    const historyContainer = document.getElementById('search-history');
+    if (!historyContainer.contains(event.target) && !document.getElementById('history-icon').contains(event.target)) {
+        historyContainer.classList.add('hidden');
+    }
+});
+
