@@ -1,14 +1,112 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Pacha Malayalam Dictionary</title><link rel="stylesheet" href="styles.css"><link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;700&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></head> <body><nav class="navbar"> <div class="logo">പച്ചമലയാളം</div> <div class="icons"> <span class="material-icons theme-toggle">light_mode</span> <span class="material-icons menu-icon">menu</span> </div> </nav> <div class="mobile-menu hidden"> <ul> <li><a href="index.html">പൂമുറ്റം</a></li> <li><a href="wordlist.html">വാക്കുവരി</a></li> <li><a href="about.html">കുറിച്ച്</a></li> <li><a href="addword.html">വാക്കുചേര്‍ക്കൂ</a></li> <li><a href="participate.html">പങ്കുചേരൂ</a></li> </ul> </div> <main> <div class="search-section"> <div class="search-bar"> <input id="searchInput" type="text" placeholder="തിരയുക..." oninput="debouncedTransliterate()"> <span class="material-icons search-icon" id="searchIcon">search</span> <span class="material-icons history-icon" id="history-icon">history</span> </div> <div class="manglish"> <label> <input type="checkbox" id="manglish-toggle"> മംglish കീboard </label> </div> <div id="search-history" class="search-history hidden"></div> </div> <div id="results-container"></div> <div id="entry-count" class="entry-count">നിലവിലെ വാക്കുകളുടെ എണ്ണം </div> <section class="word-of-the-day"> <h1>ഇന്നത്തെ വാക്ക്</h1> <h2 id="word-title"></h2> <p id="word-pos"></p> <p id="word-meaning"></p> </section> <div class="notice"> <h2>അറിയിപ്പ് !</h2> <p>ഇത് പച്ചമലയാളം നിഘണ്ടുവിന്റെ ഒരു പരീക്ഷണരൂപം മാത്രമാണ്. ഇതില്‍ വാക്കുകളുടെ എണ്ണം പരിമിതമാണ്. ഇതില്‍ എഴുത്തുപിഴവുകളും മറ്റും ഉണ്ടാകാനിടയുണ്ട്. ദയവായി അത്തരത്തില്‍ എന്തെകിലും കണ്ണില്‍പെട്ടാല്‍ ഞങ്ങളെ <a href="addword.html">അറിയിക്കുക</a></p> </div> </main> <footer class="footer"> <nav> <a href="index.html">പൂമുറ്റം</a> <a href="wordlist.html">വാക്കുവരി</a> <a href="about.html">കുറിച്ച്</a> <a href="addword.html">വാക്കുചേര്‍ക്കൂ</a> <a href="participate.html">പങ്കുചേരൂ</a> </nav> <p>copyright @ 2024</p> </footer> <script src="manglish.js" defer></script> <script src="dict.js" defer></script> <script src="iso.js" defer></script> <script src="scripts.js" defer></script> <script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacha Malayalam Dictionary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="logo">പച്ചമലയാളം</div>
+        <div class="icons">
+            <span class="material-icons theme-toggle">light_mode</span>
+            <span class="material-icons menu-icon">menu</span>
+        </div>
+    </nav>
+
+    
+    <div class="mobile-menu hidden">
+        <ul>
+            <li><a href="index.html">പൂമുറ്റം</a></li>
+            <li><a href="wordlist.html">വാക്കുവരി</a></li>
+            <li><a href="about.html">കുറിച്ച്</a></li>
+            <li><a href="addword.html">വാക്കുചേര്‍ക്കൂ</a></li>
+            <li><a href="participate.html">പങ്കുചേരൂ</a></li>
+        </ul>
+    </div>
+
+    <main>
+        
+        <div class="search-section">
+            <div class="search-bar">
+                <input id="searchInput" type="text" placeholder="തിരയുക..." oninput="debouncedTransliterate()" />
+ <span class="material-icons search-icon" id="searchIcon">search</span>
+                <span class="material-icons history-icon" id="history-icon">history</span>
+                         
+            </div>
+            <div class="manglish">
+                <label>
+                    <input type="checkbox" id="manglish-toggle" />
+                    മംglish കീboard <a href='manglish.html'>(?)</a>
+                </label>
+            </div>
+                <div id="search-history" class="search-history hidden"></div>
+        </div>
+        <div id="results-container"></div>
+         <div id="entry-count" class="entry-count">നിലവിലെ വാക്കുകളുടെ എണ്ണം </div>
+     <section class="word-of-the-day">
+			 			 <h1>ഇന്നത്തെ വാക്ക്</h1>
+        <h2 id="word-title"></h2>
+        <p id="word-pos"></p>
+        <p id="word-meaning"></p>
+    </section>
+    
+    <div class="notice">
+    <h2>അറിയിപ്പ് !</h2>
+    <p>ഇത് പച്ചമലയാളം നിഘണ്ടുവിന്റെ ഒരു പരീക്ഷണരൂപം മാത്രമാണ്. ഇതില്‍ വാക്കുകളുടെ എണ്ണം പരിമിതമാണ്. ഇതില്‍ എഴുത്തുപിഴവുകളും മറ്റും ഉണ്ടാകാനിടയുണ്ട്. ദയവായി അത്തരത്തില്‍ എന്തെകിലും കണ്ണില്‍പെട്ടാല്‍ ഞങ്ങളെ <a href="addword.html">അറിയിക്കുക</a></p>
+    </div>
+    
+    </main>
+
+    
+    <footer class="footer">
+        <nav>
+            <a href="index.html">പൂമുറ്റം</a>
+              <a href="wordlist.html">വാക്കുവരി</a>
+            <a href="about.html">കുറിച്ച്</a>
+            <a href="addword.html">വാക്കുചേര്‍ക്കൂ</a>
+            <a href="participate.html">പങ്കുചേരൂ</a>
+        </nav>
+        <p>copyright @ 2024</p>
+    </footer>
+
+    
+    <script src="manglish.js" defer></script>
+    <script src="dict.js" defer></script>
+    <script src="iso.js" defer></script>
+    <script src="scripts.js" defer></script>
+    <script>
+    // Function to fetch the word of the day from XML
     async function getWordOfTheDay() {
         try {
-            const response = await fetch('data.xml'); 
+            const response = await fetch('data.xml');
             const xmlText = await response.text();
             const parser = new DOMParser();
             const xml = parser.parseFromString(xmlText, 'application/xml');
             const entries = xml.getElementsByTagName('entry');
+            
+    
             const today = new Date();
-            const index = today.getDate() % entries.length;
+            const index = today.getDate() % entries.length; 
+            
             const entry = entries[index];
             const headword = entry.getElementsByTagName('headword')[0].textContent;
             const pos = entry.getElementsByTagName('pos')[0].textContent;
-            const senses = Array.from(entry.getElementsByTagName('sense')).map(sense =</script> </body></html>
+            const senses = Array.from(entry.getElementsByTagName('sense')).map(sense => sense.textContent).join(', ');
+
+            document.getElementById("word-title").textContent = headword;
+            document.getElementById("word-pos").textContent = `${pos}`;
+            document.getElementById("word-meaning").textContent = `${senses}`;
+        } catch (error) {
+            console.error('Error fetching the word of the day:', error);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", getWordOfTheDay);
+</script>
+</body>
+</html>
